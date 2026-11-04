@@ -92,11 +92,14 @@ They require the outputs of steps 1–3.
 
 | Step | Parameter |
 |---|---|
+| Gene symbols | multi-symbol names split on `;`, first symbol kept (liver and kidney alike); duplicates collapsed by mean |
 | Detection filter | ≥70% of samples per group (liver); ≥50% (kidney) |
 | Missing values | within-group median imputation |
 | Normalisation | column-wise median centring |
 | Differential analysis | `limma`, `eBayes(trend = TRUE)` |
 | DEP threshold | nominal P < 0.05 and \|log2FC\| ≥ log2(1.5) |
+| Sensitivity analysis | MASLD vs control re-filtered and re-imputed within that subset (5484 genes) |
+| PCA | `prcomp(center = TRUE, scale. = TRUE)` |
 | Kidney samples | real tissue only (DT/NT); 3 technical replicates merged by mean |
 | STRING | v12, combined score ≥ 0.4 |
 | Louvain | `igraph::cluster_louvain`, `set.seed(1)`, resolution 1.0 |
@@ -108,6 +111,11 @@ They require the outputs of steps 1–3.
 
 - The liver matrix distributed by PRIDE is on a **linear intensity** scale;
   `01_liver.R` applies log2 before modelling.
+- `results/kidney_mat.rds` stores both `mi` (pre-collapse, for exploratory
+  scripts) and `mi_gene` (gene-level, unique symbols). **Use `mi_gene`** in any
+  new script; `03_joint.R` and `05_kegg_auc.R` already prefer it.
+- Gene symbols must be treated identically in every script (`;` split, first
+  symbol). Mixing rules gives a common background of 2846 instead of 2851.
 - `PXD056281/proteinGroups.txt` also contains 3D cyst models (DC/NC). Only the
   real-tissue columns (DT/NT) are used.
 - Nominal-P DEP counts vary by ~1% across reasonable implementations; the

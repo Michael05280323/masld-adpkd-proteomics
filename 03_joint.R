@@ -28,7 +28,9 @@ lm_ <- sweep(lm_, 2, apply(lm_,2,median,na.rm=TRUE), "-")
 cat("### liver model matrix:", nrow(lm_), "genes x", ncol(lm_), "samples\n")
 
 ## ---- rebuild kidney model matrix ----
-L <- readRDS(file.path(OUT,"kidney_mat.rds")); mi <- L$mi; kgrp <- L$grp
+L <- readRDS(file.path(OUT,"kidney_mat.rds"))
+mi <- if (!is.null(L$mi_gene)) L$mi_gene else L$mi   # gene-level, unique symbols
+kgrp <- L$grp
 A <- colnames(mi)[kgrp=="ADPKD"]; N <- colnames(mi)[kgrp=="normal"]
 kd <- mi[rowSums(!is.na(mi[,A,drop=FALSE]))>=ceiling(.5*length(A)) &
          rowSums(!is.na(mi[,N,drop=FALSE]))>=ceiling(.5*length(N)),,drop=FALSE]

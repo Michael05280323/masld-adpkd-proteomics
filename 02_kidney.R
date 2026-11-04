@@ -96,7 +96,11 @@ cat("\n### MANUSCRIPT CLAIMS (mean replicate merge): model 3264 | DEP 1265 (651/
 r <- res[["mean"]]
 fwrite(r$tt,  file.path(OUT,"kidney_limma_full.csv"))
 fwrite(r$dep, file.path(OUT,"kidney_DEP.csv"))
-saveRDS(list(mi=mi, grp=grp), file.path(OUT,"kidney_mat.rds"))
+## save BOTH the pre-collapse matrix (exploratory scripts) and the gene-level
+## collapsed matrix (used by 03_joint.R and 05_kegg_auc.R), so every downstream
+## script sees unique gene symbols.
+saveRDS(list(mi = mi, mi_gene = collapse(mi, "mean"), grp = grp),
+        file.path(OUT, "kidney_mat.rds"))
 
 cat("\n=========== manuscript-named kidney hits ===========\n")
 named <- c("LTF","PLIN4","EFEMP1","FLNC","AKR1B10","PDLIM4","PDLIM7","ZYX","LCN2",

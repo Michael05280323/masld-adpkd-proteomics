@@ -35,7 +35,9 @@ Q <- fread(file.path(DATA,"PXD051911__liver_protein_quant.txt"), na.strings=c("N
 M <- fread(file.path(DATA,"PXD051911__meta_data.txt"), na.strings=c("NA","","NaN"))
 sm <- setdiff(names(Q), c("ProteinAccessions","Genes","ProteinDescriptions"))
 gm <- M$saf_diagnosis; names(gm) <- M$liver_proteomics_filename; grp <- gm[sm]; names(grp) <- sm
-Q[, Genes := trimws(as.character(Genes))]; Q <- Q[!is.na(Genes) & Genes!=""]
+## same symbol rule as 01_liver.R: split multi-symbol names on ";" and keep the first
+Q[, Genes := sapply(strsplit(trimws(as.character(Genes)), ";", fixed = TRUE), function(x) trimws(x[1]))]
+Q <- Q[!is.na(Genes) & Genes!=""]
 ag <- Q[, c("Genes",sm), with=FALSE][, lapply(.SD, function(x){
       x<-suppressWarnings(as.numeric(x)); if(all(is.na(x))) NA_real_ else mean(x,na.rm=TRUE)}),
       by=Genes, .SDcols=sm]
@@ -50,7 +52,16 @@ for (gg in unique(grp)) { i<-which(grp==gg); s<-LM[,i,drop=FALSE]
 LMn <- sweep(LM,2,apply(LM,2,median,na.rm=TRUE),"-")     # normalised
 lLab <- factor(grp, levels=c("No_MASLD","MASH"))
 ## kidney matrix
-L <- readRDS(file.path(OUT,"kidney_mat.rds")); mi <- L$mi; kgrp <- L$grp
+L <- readRDS(file.path(OUT,"kidney_mat.rds"))
+mi <- if (!is.null(L$mi_gene)) L$mi_gene else L$mi   # prefer gene-level matrix
+kgrp <- L$grp
+## defensive: collapse any duplicate symbols (old kidney_mat.rds files)
+if (anyDuplicated(rownames(mi))) {
+  ag <- rowsum(mi, rownames(mi), na.rm = TRUE, reorder = TRUE)
+  cn <- rowsum(matrix(as.numeric(!is.na(mi)), nrow = nrow(mi), dimnames = dimnames(mi)),
+               rownames(mi), reorder = TRUE)
+  mi <- ag / cn; mi[cn == 0] <- NA
+}
 A <- colnames(mi)[kgrp=="ADPKD"]; N <- colnames(mi)[kgrp=="normal"]
 KM <- mi[rowSums(!is.na(mi[,A,drop=FALSE]))>=ceiling(.5*length(A)) &
          rowSums(!is.na(mi[,N,drop=FALSE]))>=ceiling(.5*length(N)),,drop=FALSE]
