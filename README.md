@@ -135,11 +135,11 @@ MIT — see `LICENSE`.
 ## Citation
 
 If you use this code, please cite the manuscript above and the versioned
-Zenodo archive (release v1.0):
+Zenodo archive (release v1.1):
 
 > Michael05280323. (2026). Integrative proteomic analysis of shared
-> differential proteins between MASLD and ADPKD: analysis code (v1.0).
-> Zenodo. https://doi.org/10.5281/zenodo.23874378
+> differential proteins between MASLD and ADPKD: analysis code (v1.1).
+> Zenodo. https://doi.org/10.5281/zenodo.23940679
 
-The DOI for this release is **10.5281/zenodo.23874378**
-(https://doi.org/10.5281/zenodo.23874378).
+The DOI for this release is **10.5281/zenodo.23940679**
+(https://doi.org/10.5281/zenodo.23940679).
